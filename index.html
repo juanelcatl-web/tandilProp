@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TandilProp Elite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TandilProp Estable</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -12,57 +12,42 @@
     <style>
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background: #f1f5f9; }
         .main-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100%; max-width: 500px; margin: 0 auto; background: white; }
-        
-        /* Header fijo */
-        header { background: white; border-b: 1px solid #e2e8f0; flex-shrink: 0; z-index: 100; padding: 10px 15px; }
-        
-        /* Contenedor de Vistas */
+        header { background: white; border-b: 1px solid #e2e8f0; flex-shrink: 0; z-index: 100; padding: 12px 16px; }
         .content-area { flex-grow: 1; position: relative; overflow: hidden; }
         .view { position: absolute; inset: 0; width: 100%; height: 100%; display: none; overflow-y: auto; background: white; }
         .view.active { display: block; z-index: 50; }
-        #map { height: 100%; width: 100%; }
-
-        /* Nav fijo */
-        nav { height: 80px; background: white; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; align-items: center; flex-shrink: 0; z-index: 200; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-link { text-align: center; color: #94a3b8; font-size: 10px; font-weight: 800; text-transform: uppercase; border:none; background:none; }
+        #map { height: 100%; width: 100%; z-index: 1; }
+        nav { height: 80px; background: white; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; align-items: center; flex-shrink: 0; z-index: 200; padding-bottom: 10px; }
+        .nav-link { text-align: center; color: #94a3b8; font-size: 10px; font-weight: 800; text-transform: uppercase; border: none; background: none; }
         .nav-link.active { color: #4f46e5; }
-        .btn-plus { background: #4f46e5; color: white; width: 50px; height: 50px; border-radius: 15px; font-size: 28px; display: flex; align-items: center; justify-content: center; margin-top: -40px; border: 4px solid white; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-
-        /* Publicidad */
+        .btn-plus { background: #4f46e5; color: white; width: 50px; height: 50px; border-radius: 15px; font-size: 28px; display: flex; align-items: center; justify-content: center; margin-top: -35px; border: 4px solid white; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
         .ad-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        
-        /* Ajuste de Popup para que no rompa el mapa */
-        .custom-popup .leaflet-popup-content-wrapper { border-radius: 15px; padding: 5px; }
-        .custom-popup button { background: #4f46e5; color: white; border: none; padding: 8px; border-radius: 8px; width: 100%; font-weight: bold; margin-top: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="ad-screen" class="ad-overlay">
-        <div class="text-center">
-            <h2 class="text-indigo-500 font-black italic mb-4">TandilProp Ads</h2>
-            <div class="w-64 h-36 bg-slate-800 rounded-3xl border border-white/10 flex items-center justify-center mb-4">
-                <span class="text-[10px] font-bold text-slate-400">CARGANDO...</span>
-            </div>
-            <p id="timer-text" class="text-xs">Espere un momento</p>
+        <div class="text-center p-6">
+            <h2 class="text-indigo-500 font-black italic mb-4">TandilProp</h2>
+            <p id="timer-text" class="text-xs font-bold">Cargando...</p>
         </div>
     </div>
 
     <div class="main-wrapper">
         <header>
-            <div class="flex justify-between items-center mb-2">
+            <div class="flex justify-between items-center mb-3">
                 <h1 class="text-xl font-black text-indigo-600 italic uppercase">TandilProp</h1>
-                <button onclick="location.reload()" class="text-[10px] font-bold bg-slate-100 px-2 py-1 rounded">REFRESCAR</button>
+                <button onclick="location.reload()" class="text-[10px] font-bold bg-slate-100 px-3 py-1 rounded-lg">🔄 REFRESCAR</button>
             </div>
             <div class="flex gap-2">
                 <select id="f-type" onchange="applyFilters()" class="flex-1 bg-slate-100 text-[9px] p-2 rounded-lg font-black outline-none border-none">
-                    <option value="todos">TODOS LOS TIPOS</option>
-                    <option value="casa">CASAS</option>
-                    <option value="depto">DEPARTAMENTOS</option>
-                    <option value="terreno">TERRENOS</option>
+                    <option value="todos">TIPO: TODOS</option>
+                    <option value="casa">CASA</option>
+                    <option value="depto">DEPTO</option>
+                    <option value="terreno">TERRENO</option>
                 </select>
                 <select id="f-op" onchange="applyFilters()" class="flex-1 bg-slate-100 text-[9px] p-2 rounded-lg font-black outline-none border-none text-indigo-600">
-                    <option value="todos">OPERACIONES</option>
+                    <option value="todos">OP: TODAS</option>
                     <option value="venta">VENTA</option>
                     <option value="alquiler">ALQUILER</option>
                 </select>
@@ -71,27 +56,23 @@
 
         <div class="content-area">
             <div id="view-map" class="view active"><div id="map"></div></div>
-            <div id="view-list" class="view p-4 bg-slate-50"><div id="list-container" class="space-y-4 pb-20"></div></div>
+            <div id="view-list" class="view p-4 bg-slate-50"><div id="list-container" class="space-y-4 pb-16"></div></div>
             <div id="view-add" class="view p-6">
-                <h2 class="text-xl font-black mb-4 italic">PUBLICAR</h2>
-                <div class="space-y-3 pb-20">
-                    <input type="text" id="p-title" placeholder="Título" class="w-full p-4 bg-slate-100 rounded-xl outline-none font-bold">
+                <h2 class="text-xl font-black mb-6 italic">PUBLICAR</h2>
+                <div class="space-y-4 pb-20">
+                    <input type="text" id="p-title" placeholder="Título" class="w-full p-4 bg-slate-100 rounded-2xl outline-none font-bold">
                     <div class="flex gap-2">
-                        <select id="p-type" class="flex-1 p-3 bg-slate-100 rounded-xl font-bold outline-none text-xs">
-                            <option value="casa">Casa</option><option value="depto">Depto</option><option value="terreno">Terreno</option>
-                        </select>
-                        <select id="p-op" class="flex-1 p-3 bg-slate-100 rounded-xl font-bold outline-none text-xs text-indigo-600">
-                            <option value="venta">Venta</option><option value="alquiler">Alquiler</option>
-                        </select>
+                        <select id="p-type" class="flex-1 p-4 bg-slate-100 rounded-xl font-bold text-xs outline-none"><option value="casa">Casa</option><option value="depto">Depto</option><option value="terreno">Terreno</option></select>
+                        <select id="p-op" class="flex-1 p-4 bg-slate-100 rounded-xl font-bold text-xs outline-none text-indigo-600"><option value="venta">Venta</option><option value="alquiler">Alquiler</option></select>
                     </div>
-                    <input type="number" id="p-price" placeholder="Precio USD" class="w-full p-4 bg-slate-100 rounded-xl outline-none font-bold">
+                    <input type="number" id="p-price" placeholder="Precio USD" class="w-full p-4 bg-slate-100 rounded-2xl outline-none font-bold">
                     <div class="flex gap-2">
-                        <input type="text" id="p-address" placeholder="Dirección en Tandil" class="flex-1 p-4 bg-indigo-50 border border-indigo-100 rounded-xl outline-none font-bold text-xs">
-                        <button onclick="searchGeo()" class="bg-indigo-600 text-white px-3 rounded-xl font-black text-[9px]">UBICAR</button>
+                        <input type="text" id="p-address" placeholder="Dirección en Tandil" class="flex-1 p-4 bg-indigo-50 border border-indigo-100 rounded-xl font-bold text-xs outline-none">
+                        <button onclick="searchGeo()" class="bg-indigo-600 text-white px-4 rounded-xl font-black text-[10px]">UBICAR</button>
                     </div>
-                    <input type="text" id="p-wa" placeholder="WhatsApp (Ej: 2494...)" class="w-full p-4 bg-slate-100 rounded-xl outline-none font-bold">
-                    <input type="text" id="p-img" placeholder="URL de Foto" class="w-full p-4 bg-slate-100 rounded-xl outline-none font-bold">
-                    <button onclick="publish()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase shadow-lg active:scale-95 transition-all">Subir Propiedad</button>
+                    <input type="text" id="p-wa" placeholder="WhatsApp (Ej: 2494112233)" class="w-full p-4 bg-slate-100 rounded-2xl outline-none font-bold">
+                    <input type="text" id="p-img" placeholder="URL Foto" class="w-full p-4 bg-slate-100 rounded-2xl outline-none">
+                    <button onclick="publish()" class="w-full bg-slate-900 text-white py-5 rounded-3xl font-black uppercase shadow-lg active:scale-95 transition-all">Subir Propiedad</button>
                 </div>
             </div>
         </div>
@@ -99,7 +80,7 @@
         <nav>
             <button onclick="changeTab('map')" id="btn-map" class="nav-link active">MAPA</button>
             <button onclick="changeTab('add')" class="btn-plus">+</button>
-            <button onclick="changeTab('list')" id="btn-list" class="nav-link">LISTA</button>
+            <button onclick="changeTab('list')" id="btn-list" class="nav-link">CATÁLOGO</button>
         </nav>
     </div>
 
@@ -127,21 +108,19 @@
             document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
             document.getElementById('view-' + t).classList.add('active');
             if(t !== 'add') document.getElementById('btn-' + t).classList.add('active');
-            if(t === 'map') setTimeout(() => map.invalidateSize(), 400);
+            if(t === 'map') setTimeout(() => map.invalidateSize(), 300);
         }
 
         async function searchGeo() {
             const addr = document.getElementById('p-address').value;
             if(!addr) return;
-            try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr + ', Tandil, Argentina')}`);
-                const data = await res.json();
-                if(data.length > 0) {
-                    cLat = parseFloat(data[0].lat); cLng = parseFloat(data[0].lon);
-                    map.setView([cLat, cLng], 17);
-                    alert("📍 Ubicado.");
-                }
-            } catch(e) {}
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr + ', Tandil, Argentina')}`);
+            const data = await res.json();
+            if(data.length > 0) {
+                cLat = parseFloat(data[0].lat); cLng = parseFloat(data[0].lon);
+                map.setView([cLat, cLng], 17);
+                alert("📍 Ubicado.");
+            }
         }
 
         function publish() {
@@ -151,13 +130,13 @@
             if(!title || !price || !wa) return alert("Faltan datos");
 
             db.push({
-                title, price, wa, 
+                title, price, wa,
                 type: document.getElementById('p-type').value,
                 op: document.getElementById('p-op').value,
                 img: document.getElementById('p-img').value,
                 lat: cLat, lng: cLng
             }).then(() => {
-                alert("¡Cargado!");
+                alert("✅ Publicado!");
                 changeTab('map');
             });
         }
@@ -168,7 +147,7 @@
             let t = 3;
             const i = setInterval(() => {
                 t--;
-                document.getElementById('timer-text').innerText = "Cargando en " + t + "s...";
+                document.getElementById('timer-text').innerText = "Abriendo en " + t + "s...";
                 if(t <= 0) { clearInterval(i); ad.style.display = 'none'; cb(); }
             }, 1000);
         }
@@ -181,4 +160,25 @@
 
         function applyFilters() {
             const ft = document.getElementById('f-type').value;
-            const fo = document.getElementById('
+            const fo = document.getElementById('f-op').value;
+            const filtered = allProps.filter(p => (ft === 'todos' || p.type === ft) && (fo === 'todos' || p.op === fo));
+
+            map.eachLayer(l => { if(l instanceof L.Marker) map.removeLayer(l) });
+            filtered.forEach(p => {
+                L.marker([p.lat, p.lng]).addTo(map).on('click', () => {
+                    alert(`${p.title}\nU$D ${p.price}\nBúscalo en el Catálogo para contactar.`);
+                });
+            });
+
+            document.getElementById('list-container').innerHTML = filtered.map(p => `
+                <div class="bg-white rounded-[2rem] overflow-hidden border p-3 shadow-md relative">
+                    <img src="${p.img || 'https://via.placeholder.com/400x200'}" class="w-full h-40 object-cover rounded-3xl mb-3">
+                    <h4 class="font-black text-sm uppercase italic">${p.title}</h4>
+                    <p class="text-indigo-600 font-black text-2xl mb-3">U$D ${p.price}</p>
+                    <button onclick="showAd(() => window.open('https://wa.me/${p.wa.replace(/\D/g,'')}'))" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[10px]">Contactar WhatsApp</button>
+                </div>
+            `).reverse().join('');
+        }
+    </script>
+</body>
+</html>
