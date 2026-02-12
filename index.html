@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TandilProp v19</title>
+    <title>TandilProp v22 - Monetized</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -11,71 +11,69 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
     <style>
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; background: #fff; position: fixed; }
+        body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; background: #fdfdfd; font-family: sans-serif; }
         
-        .app-shell { display: flex; flex-direction: column; height: 100vh; width: 100%; }
-        header { height: 110px; background: white; border-bottom: 2px solid #f1f5f9; padding: 10px; z-index: 500; }
-        .main-container { flex: 1; position: relative; overflow: hidden; }
-        
-        .view { position: absolute; inset: 0; display: none; background: white; z-index: 10; }
-        .view.active { display: block; }
-        #map { width: 100% !important; height: 100% !important; z-index: 1; }
+        /* Overlay de Vídeo con Sponsor */
+        #video-overlay {
+            position: fixed; inset: 0; background: black; z-index: 10000;
+            display: none; align-items: center; justify-content: center;
+        }
+        video { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
 
-        /* EL BOTÓN (+) CORREGIDO */
-        #btn-plus {
-            position: absolute;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 72px; height: 72px;
-            background: #4f46e5;
-            color: white;
-            border-radius: 24px;
-            font-size: 45px;
-            border: 6px solid white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 12px 24px rgba(0,0,0,0.3);
-            z-index: 9999 !important;
-            cursor: pointer;
-            transition: opacity 0.2s;
+        /* Estilo de Tarjeta de Publicidad */
+        .ad-card {
+            background: #fffbeb; border: 2px dashed #f59e0b; border-radius: 24px;
+            padding: 15px; margin-bottom: 20px; position: relative;
+        }
+        .ad-badge {
+            position: absolute; top: 10px; right: 10px; background: #f59e0b;
+            color: white; font-size: 8px; font-weight: 900; padding: 2px 8px; border-radius: 10px;
         }
 
-        nav { height: 75px; background: white; border-top: 2px solid #f1f5f9; display: flex; z-index: 100; }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #94a3b8; font-size: 11px; text-transform: uppercase; }
+        .prop-card {
+            background: white; border-radius: 24px; padding: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        #btn-confirm {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: #4f46e5; color: white; padding: 16px 32px; border-radius: 50px;
+            font-weight: 800; border: 4px solid white; display: none; z-index: 2000;
+        }
+
+        nav { height: 85px; background: white; border-top: 1px solid #eee; display: flex; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 700; }
         .nav-item.active { color: #4f46e5; }
-
-        /* Colores de pines */
-        .pin-azul { filter: hue-rotate(0deg); } /* Casas */
-        .pin-rojo { filter: hue-rotate(140deg) saturate(2); } /* Deptos */
-        .pin-negro { filter: grayscale(1) brightness(0.2); } /* Terrenos */
-        .pin-nuevo { filter: hue-rotate(240deg) brightness(1.5); } /* Dorado */
-
-        #floating-confirm {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            background: #4f46e5; color: white; padding: 15px 30px; border-radius: 16px;
-            font-weight: 900; border: 2px solid white; display: none; z-index: 2000;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        }
     </style>
 </head>
 <body>
 
-<div class="app-shell">
-    <header>
-        <div class="flex justify-between items-center mb-2">
-            <h1 class="text-xl font-black text-indigo-600 italic">TANDILPROP</h1>
-            <button onclick="location.reload()" class="p-2 bg-slate-100 rounded text-[10px] font-bold">ACTUALIZAR</button>
+<div id="video-overlay">
+    <video id="transition-video" muted playsinline>
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-modern-apartment-complex-buildings-at-sunset-15437-large.mp4" type="video/mp4">
+    </video>
+    <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
+        <p class="text-amber-400 text-xs font-bold tracking-[0.3em] mb-2 uppercase">Patrocinado por</p>
+        <h2 id="sponsor-name" class="text-white text-3xl font-black italic mb-4">INMOBILIARIA TANDIL</h2>
+        <div class="w-12 h-1 bg-amber-400 rounded-full animate-pulse"></div>
+    </div>
+</div>
+
+<div class="app-shell flex flex-col h-screen">
+    <header class="p-4 bg-white border-bottom">
+        <div class="flex justify-between items-center mb-3">
+            <h1 class="text-2xl font-black text-indigo-600 italic">TANDILPROP</h1>
+            <span class="text-[10px] font-bold text-slate-400">ADS READY</span>
         </div>
         <div class="flex gap-2">
-            <select id="f-type" onchange="loadData()" class="flex-1 p-2 bg-slate-50 border rounded text-[10px] font-bold">
+            <select id="f-type" onchange="loadData()" class="flex-1 p-3 bg-slate-100 rounded-xl text-xs font-bold outline-none border-none">
                 <option value="todos">TIPO: TODOS</option>
                 <option value="casa">🏠 CASAS</option>
                 <option value="depto">🏢 DEPTOS</option>
                 <option value="terreno">🌳 TERRENOS</option>
             </select>
-            <select id="f-op" onchange="loadData()" class="flex-1 p-2 bg-indigo-50 text-indigo-600 border rounded text-[10px] font-bold">
+            <select id="f-op" onchange="loadData()" class="flex-1 p-3 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-bold outline-none border-none">
                 <option value="todos">OPERACIÓN</option>
                 <option value="venta">VENTA</option>
                 <option value="alquiler">ALQUILER</option>
@@ -83,44 +81,41 @@
         </div>
     </header>
 
-    <div class="main-container">
-        <div id="btn-plus" onclick="execAdd()">+</div>
-        
-        <button id="floating-confirm" onclick="openForm()">CONFIRMAR POSICIÓN 📍</button>
-
-        <div id="v-map" class="view active"><div id="map"></div></div>
+    <main class="flex-1 relative overflow-hidden">
+        <div id="v-map" class="view active h-full w-full">
+            <div id="map" class="h-full w-full"></div>
+            <button id="btn-confirm" onclick="openForm()">📍 Confirmar Ubicación</button>
+        </div>
         
         <div id="v-list" class="view overflow-y-auto p-4 bg-slate-50">
-            <div id="l-container" class="space-y-4 pb-20"></div>
+            <div id="l-container" class="pb-24"></div>
         </div>
 
-        <div id="v-form" class="view overflow-y-auto p-6">
-            <h2 class="text-2xl font-black uppercase italic mb-6 text-indigo-600">Publicar</h2>
+        <div id="v-form" class="view overflow-y-auto p-6 bg-white">
+            <h2 class="text-3xl font-black italic mb-6">Detalles</h2>
             <div class="space-y-4 pb-24">
-                <input type="text" id="p-title" placeholder="Título" class="w-full p-4 bg-slate-50 rounded-xl font-bold border">
+                <input type="text" id="p-title" placeholder="Título" class="w-full p-4 bg-slate-100 rounded-2xl font-bold">
                 <div class="flex gap-2">
-                    <select id="p-type" class="flex-1 p-4 bg-slate-50 rounded-xl font-bold uppercase"><option value="casa">Casa</option><option value="depto">Depto</option><option value="terreno">Terreno</option></select>
-                    <select id="p-op" class="flex-1 p-4 bg-slate-50 rounded-xl font-bold text-indigo-600 uppercase"><option value="venta">Venta</option><option value="alquiler">Alquiler</option></select>
+                    <select id="p-type" class="flex-1 p-4 bg-slate-100 rounded-2xl font-bold"><option value="casa">Casa</option><option value="depto">Depto</option><option value="terreno">Terreno</option></select>
+                    <select id="p-op" class="flex-1 p-4 bg-slate-100 rounded-2xl font-bold text-indigo-600"><option value="venta">Venta</option><option value="alquiler">Alquiler</option></select>
                 </div>
-                <input type="number" id="p-price" placeholder="Precio USD" class="w-full p-4 bg-slate-50 rounded-xl font-bold">
-                <input type="text" id="p-address" placeholder="Dirección" class="w-full p-4 bg-white border-2 border-indigo-100 rounded-xl font-bold">
-                <input type="text" id="p-wa" placeholder="WhatsApp (249...)" class="w-full p-4 bg-slate-50 rounded-xl font-bold">
-                <input type="text" id="p-img" placeholder="Link de Foto" class="w-full p-4 bg-slate-50 rounded-xl">
-                <button onclick="saveProp()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase">Subir Propiedad</button>
-                <button onclick="cancelAdd()" class="w-full py-2 text-slate-400 font-bold uppercase text-[10px]">Cancelar</button>
+                <input type="number" id="p-price" placeholder="U$D Precio" class="w-full p-4 bg-slate-100 rounded-2xl font-bold">
+                <input type="text" id="p-address" placeholder="Dirección Automática" class="w-full p-4 bg-indigo-50 rounded-2xl font-bold">
+                <input type="text" id="p-wa" placeholder="WhatsApp" class="w-full p-4 bg-slate-100 rounded-2xl font-bold">
+                <input type="text" id="p-img" placeholder="URL Foto" class="w-full p-4 bg-slate-100 rounded-2xl">
+                <button onclick="saveProp()" class="w-full bg-indigo-600 text-white py-5 rounded-[2rem] font-black uppercase shadow-lg">Publicar</button>
+                <button onclick="cancelAdd()" class="w-full py-4 text-slate-400 font-bold uppercase text-xs text-center">Cerrar</button>
             </div>
         </div>
-    </div>
+    </main>
 
     <nav>
-        <div id="t-map" onclick="showView('map')" class="nav-item active">Mapa</div>
-        <div style="flex:1"></div>
-        <div id="t-list" onclick="showView('list')" class="nav-item">Lista</div>
+        <div id="t-map" onclick="showView('map')" class="nav-item active"><span class="text-2xl">🗺️</span>Mapa</div>
+        <div id="t-list" onclick="showView('list')" class="nav-item"><span class="text-2xl">🏠</span>Lista</div>
     </nav>
 </div>
 
 <script>
-    // Config Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyBUViSxd76R5Xc3h4obWtbkGEXADPH8qTw",
         authDomain: "tandilprop-56ec1.firebaseapp.com",
@@ -130,59 +125,50 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('tandil_vfinal_fix');
 
-    // Init Mapa
     var map = L.map('map', {zoomControl: false, attributionControl: false}).setView([-37.3217, -59.1332], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
     var latC, lngC, tempM;
 
-    // LA FUNCIÓN DE EJECUCIÓN DIFERIDA (EL ARREGLO)
-    window.execAdd = function() {
-        // Primero: La lógica
-        showView('map');
-        var center = map.getCenter();
-        dropMarker(center.lat, center.lng);
-        map.setView(center, 16);
-        
-        // Segundo: El efecto visual con delay para asegurar el clic
-        setTimeout(() => {
-            document.getElementById('btn-plus').style.display = 'none';
-        }, 150);
+    // SIMULADOR DE PUBLICIDAD (El día de mañana esto vendrá de una base de datos)
+    const AD_DATA = {
+        title: "¡Construí tu sueño!",
+        desc: "Corralón Tandil - Ofertas en cemento y ladrillos.",
+        img: "https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?w=500",
+        link: "https://wa.me/2494000000"
     };
 
-    map.on('click', function(e) { dropMarker(e.latlng.lat, e.latlng.lng); });
-
-    function dropMarker(lat, lng) {
-        if(tempM) map.removeLayer(tempM);
-        latC = lat; lngC = lng;
-        tempM = L.marker([lat, lng], {draggable: true}).addTo(map);
-        tempM.getElement().classList.add('pin-nuevo');
-        document.getElementById('floating-confirm').style.display = 'block';
-        document.getElementById('btn-plus').style.display = 'none';
-        
-        tempM.on('dragend', function(ev) {
-            latC = ev.target.getLatLng().lat;
-            lngC = ev.target.getLatLng().lng;
-        });
+    function triggerConsult(wa) {
+        const overlay = document.getElementById('video-overlay');
+        const video = document.getElementById('transition-video');
+        overlay.style.display = 'flex';
+        video.play();
+        setTimeout(() => {
+            window.open('https://wa.me/' + wa);
+            overlay.style.display = 'none';
+            video.pause();
+        }, 5000);
     }
+
+    map.on('click', function(e) {
+        if(tempM) map.removeLayer(tempM);
+        latC = e.latlng.lat; lngC = e.latlng.lng;
+        tempM = L.marker([latC, lngC], {draggable: true}).addTo(map);
+        tempM.getElement().classList.add('pin-nuevo');
+        document.getElementById('btn-confirm').style.display = 'block';
+    });
 
     function showView(v) {
         document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
         document.getElementById('v-' + v).classList.add('active');
-        if(v !== 'form') document.getElementById('t-' + v).classList.add('active');
-        
-        if(v === 'map') {
-            document.getElementById('btn-plus').style.display = 'flex';
-            setTimeout(() => map.invalidateSize(), 300);
-        } else {
-            document.getElementById('btn-plus').style.display = 'none';
-        }
+        document.getElementById('t-' + v).classList.add('active');
+        if(v === 'map') setTimeout(() => map.invalidateSize(), 300);
     }
 
     function openForm() {
         showView('form');
-        document.getElementById('floating-confirm').style.display = 'none';
+        document.getElementById('btn-confirm').style.display = 'none';
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latC}&lon=${lngC}`)
             .then(r => r.json()).then(d => {
                 document.getElementById('p-address').value = (d.address.road || "") + " " + (d.address.house_number || "");
@@ -191,7 +177,7 @@
 
     function cancelAdd() {
         if(tempM) map.removeLayer(tempM);
-        document.getElementById('floating-confirm').style.display = 'none';
+        document.getElementById('btn-confirm').style.display = 'none';
         showView('map');
     }
 
@@ -199,7 +185,7 @@
         const title = document.getElementById('p-title').value;
         const price = document.getElementById('p-price').value;
         const wa = document.getElementById('p-wa').value;
-        if(!title || !price || !wa) return alert("Faltan datos");
+        if(!title || !price || !wa) return alert("Completa los datos");
 
         db.push({
             title, price, wa, address: document.getElementById('p-address').value,
@@ -207,30 +193,40 @@
             op: document.getElementById('p-op').value,
             img: document.getElementById('p-img').value,
             lat: latC, lng: lngC
-        }).then(() => { alert("Publicado!"); cancelAdd(); });
+        }).then(() => { alert("¡Publicado!"); cancelAdd(); });
     }
 
     function loadData() {
         db.on('value', snap => {
             const data = snap.val();
             const list = data ? Object.values(data) : [];
-            const tF = document.getElementById('f-type').value;
-            const oF = document.getElementById('f-op').value;
             map.eachLayer(l => { if(l instanceof L.Marker && l !== tempM) map.removeLayer(l); });
 
             let html = "";
-            list.reverse().forEach(p => {
-                if(tF !== 'todos' && p.type !== tF) return;
-                if(oF !== 'todos' && p.op !== oF) return;
+            list.reverse().forEach((p, index) => {
+                // INSERTAR PUBLICIDAD CADA 3 PROPIEDADES
+                if(index > 0 && index % 3 === 0) {
+                    html += `
+                    <div class="ad-card" onclick="window.open('${AD_DATA.link}')">
+                        <span class="ad-badge">SPONSOR</span>
+                        <div class="flex gap-4 items-center">
+                            <img src="${AD_DATA.img}" class="w-16 h-16 rounded-xl object-cover">
+                            <div>
+                                <h4 class="font-black text-amber-800 text-sm uppercase">${AD_DATA.title}</h4>
+                                <p class="text-amber-700 text-[10px] leading-tight">${AD_DATA.desc}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                }
 
                 var m = L.marker([p.lat, p.lng]).addTo(map);
-                var pCls = 'pin-azul';
-                if(p.type === 'depto') pCls = 'pin-rojo';
-                if(p.type === 'terreno') pCls = 'pin-negro';
-                m.getElement().classList.add(pCls);
-                m.bindPopup(`<div style="width:140px"><h4 class="font-bold uppercase text-[10px]">${p.title}</h4><p class="text-indigo-600 font-bold">U$D ${p.price}</p><button onclick="window.open('https://wa.me/${p.wa}')" style="width:100%;background:black;color:white;padding:8px;border-radius:8px;margin-top:5px;font-size:10px;font-weight:900">CONSULTAR</button></div>`);
-
-                html += `<div class="bg-white rounded-[2rem] p-3 shadow-md border border-slate-50"><img src="${p.img}" onerror="this.src='https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400'" class="w-full h-40 object-cover rounded-[1.5rem] mb-2"><h4 class="font-black text-sm uppercase">${p.title}</h4><p class="text-indigo-600 font-black text-xl">U$D ${p.price}</p><p class="text-slate-400 text-[9px] mb-2 uppercase">📍 ${p.address || 'Tandil'}</p><button onclick="window.open('https://wa.me/${p.wa}')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[10px]">WhatsApp</button></div>`;
+                html += `
+                <div class="prop-card">
+                    <img src="${p.img}" onerror="this.src='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500'" class="w-full h-48 object-cover rounded-2xl mb-3">
+                    <h4 class="font-black text-lg text-slate-800 uppercase">${p.title}</h4>
+                    <p class="text-2xl font-black text-indigo-600 mb-4">U$D ${p.price}</p>
+                    <button onclick="triggerConsult('${p.wa}')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-xs">Consultar</button>
+                </div>`;
             });
             document.getElementById('l-container').innerHTML = html;
         });
