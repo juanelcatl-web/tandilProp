@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TandilProp v22 - Monetized</title>
+    <title>TandilProp v23 - Business Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -11,69 +11,73 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
     <style>
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; background: #fdfdfd; font-family: sans-serif; }
+        body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; background: #fff; }
         
-        /* Overlay de Vídeo con Sponsor */
+        /* Contenedor Principal */
+        .app-shell { display: flex; flex-direction: column; height: 100vh; position: relative; }
+        
+        header { height: 110px; background: white; border-bottom: 2px solid #f1f5f9; padding: 10px; z-index: 1000; flex-shrink: 0; }
+        .main-content { flex-grow: 1; position: relative; overflow: hidden; }
+
+        /* Vistas con Z-Index Controlado */
+        .view { position: absolute; inset: 0; background: white; z-index: 10; display: none; }
+        .view.active { display: block; }
+        
+        #map { width: 100%; height: 100%; z-index: 5; }
+
+        /* Botón Confirmar: Superposición Total */
+        #btn-confirm {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; background: #4f46e5; color: white; padding: 16px 30px;
+            border-radius: 20px; font-weight: 900; border: 4px solid white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: none;
+            white-space: nowrap;
+        }
+
+        /* Nav Inferior Blindada */
+        nav { 
+            height: 80px; background: white; border-top: 2px solid #f1f5f9; 
+            display: flex; z-index: 99999; flex-shrink: 0; position: relative;
+        }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 11px; font-weight: 800; }
+        .nav-item.active { color: #4f46e5; }
+
+        /* Publicidad */
+        .ad-card { background: #fffbeb; border: 2px dashed #f59e0b; border-radius: 20px; padding: 15px; margin-bottom: 15px; }
+
+        /* Vídeo Overlay */
         #video-overlay {
-            position: fixed; inset: 0; background: black; z-index: 10000;
+            position: fixed; inset: 0; background: black; z-index: 100000;
             display: none; align-items: center; justify-content: center;
         }
-        video { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
-
-        /* Estilo de Tarjeta de Publicidad */
-        .ad-card {
-            background: #fffbeb; border: 2px dashed #f59e0b; border-radius: 24px;
-            padding: 15px; margin-bottom: 20px; position: relative;
-        }
-        .ad-badge {
-            position: absolute; top: 10px; right: 10px; background: #f59e0b;
-            color: white; font-size: 8px; font-weight: 900; padding: 2px 8px; border-radius: 10px;
-        }
-
-        .prop-card {
-            background: white; border-radius: 24px; padding: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #eee;
-            margin-bottom: 20px;
-        }
-
-        #btn-confirm {
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-            background: #4f46e5; color: white; padding: 16px 32px; border-radius: 50px;
-            font-weight: 800; border: 4px solid white; display: none; z-index: 2000;
-        }
-
-        nav { height: 85px; background: white; border-top: 1px solid #eee; display: flex; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 700; }
-        .nav-item.active { color: #4f46e5; }
     </style>
 </head>
 <body>
 
 <div id="video-overlay">
-    <video id="transition-video" muted playsinline>
+    <video id="transition-video" muted playsinline style="width:100%; height:100%; object-fit:cover; opacity:0.7">
         <source src="https://assets.mixkit.co/videos/preview/mixkit-modern-apartment-complex-buildings-at-sunset-15437-large.mp4" type="video/mp4">
     </video>
-    <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
-        <p class="text-amber-400 text-xs font-bold tracking-[0.3em] mb-2 uppercase">Patrocinado por</p>
-        <h2 id="sponsor-name" class="text-white text-3xl font-black italic mb-4">INMOBILIARIA TANDIL</h2>
-        <div class="w-12 h-1 bg-amber-400 rounded-full animate-pulse"></div>
+    <div class="absolute inset-0 flex flex-col items-center justify-center text-white">
+        <p class="text-amber-400 font-bold mb-2">SPONSOR</p>
+        <h2 class="text-2xl font-black italic">TANDILPROP PRO</h2>
     </div>
 </div>
 
-<div class="app-shell flex flex-col h-screen">
-    <header class="p-4 bg-white border-bottom">
-        <div class="flex justify-between items-center mb-3">
-            <h1 class="text-2xl font-black text-indigo-600 italic">TANDILPROP</h1>
-            <span class="text-[10px] font-bold text-slate-400">ADS READY</span>
+<div class="app-shell">
+    <header>
+        <div class="flex justify-between items-center mb-2">
+            <h1 class="text-xl font-black text-indigo-600 italic">TANDILPROP</h1>
+            <button onclick="location.reload()" class="bg-slate-100 p-2 rounded text-[10px] font-bold uppercase">Actualizar</button>
         </div>
         <div class="flex gap-2">
-            <select id="f-type" onchange="loadData()" class="flex-1 p-3 bg-slate-100 rounded-xl text-xs font-bold outline-none border-none">
-                <option value="todos">TIPO: TODOS</option>
+            <select id="f-type" onchange="loadData()" class="flex-1 p-2 bg-slate-50 border rounded text-[10px] font-bold">
+                <option value="todos">TODOS</option>
                 <option value="casa">🏠 CASAS</option>
                 <option value="depto">🏢 DEPTOS</option>
                 <option value="terreno">🌳 TERRENOS</option>
             </select>
-            <select id="f-op" onchange="loadData()" class="flex-1 p-3 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-bold outline-none border-none">
+            <select id="f-op" onchange="loadData()" class="flex-1 p-2 bg-indigo-50 text-indigo-600 border rounded text-[10px] font-bold">
                 <option value="todos">OPERACIÓN</option>
                 <option value="venta">VENTA</option>
                 <option value="alquiler">ALQUILER</option>
@@ -81,37 +85,41 @@
         </div>
     </header>
 
-    <main class="flex-1 relative overflow-hidden">
-        <div id="v-map" class="view active h-full w-full">
-            <div id="map" class="h-full w-full"></div>
-            <button id="btn-confirm" onclick="openForm()">📍 Confirmar Ubicación</button>
-        </div>
-        
-        <div id="v-list" class="view overflow-y-auto p-4 bg-slate-50">
-            <div id="l-container" class="pb-24"></div>
+    <div class="main-content">
+        <div id="v-map" class="view active">
+            <div id="map"></div>
+            <button id="btn-confirm" onclick="openForm()">📍 CONFIRMAR UBICACIÓN</button>
         </div>
 
-        <div id="v-form" class="view overflow-y-auto p-6 bg-white">
-            <h2 class="text-3xl font-black italic mb-6">Detalles</h2>
+        <div id="v-list" class="view overflow-y-auto p-4 bg-slate-50">
+            <div id="l-container" class="space-y-4 pb-24"></div>
+        </div>
+
+        <div id="v-form" class="view overflow-y-auto p-6">
+            <h2 class="text-2xl font-black italic mb-6 text-indigo-600 uppercase">Detalles</h2>
             <div class="space-y-4 pb-24">
-                <input type="text" id="p-title" placeholder="Título" class="w-full p-4 bg-slate-100 rounded-2xl font-bold">
+                <input type="text" id="p-title" placeholder="Título" class="w-full p-4 bg-slate-100 rounded-xl font-bold">
                 <div class="flex gap-2">
-                    <select id="p-type" class="flex-1 p-4 bg-slate-100 rounded-2xl font-bold"><option value="casa">Casa</option><option value="depto">Depto</option><option value="terreno">Terreno</option></select>
-                    <select id="p-op" class="flex-1 p-4 bg-slate-100 rounded-2xl font-bold text-indigo-600"><option value="venta">Venta</option><option value="alquiler">Alquiler</option></select>
+                    <select id="p-type" class="flex-1 p-4 bg-slate-100 rounded-xl font-bold uppercase"><option value="casa">Casa</option><option value="depto">Depto</option><option value="terreno">Terreno</option></select>
+                    <select id="p-op" class="flex-1 p-4 bg-slate-100 rounded-xl font-bold text-indigo-600 uppercase"><option value="venta">Venta</option><option value="alquiler">Alquiler</option></select>
                 </div>
-                <input type="number" id="p-price" placeholder="U$D Precio" class="w-full p-4 bg-slate-100 rounded-2xl font-bold">
-                <input type="text" id="p-address" placeholder="Dirección Automática" class="w-full p-4 bg-indigo-50 rounded-2xl font-bold">
-                <input type="text" id="p-wa" placeholder="WhatsApp" class="w-full p-4 bg-slate-100 rounded-2xl font-bold">
-                <input type="text" id="p-img" placeholder="URL Foto" class="w-full p-4 bg-slate-100 rounded-2xl">
-                <button onclick="saveProp()" class="w-full bg-indigo-600 text-white py-5 rounded-[2rem] font-black uppercase shadow-lg">Publicar</button>
-                <button onclick="cancelAdd()" class="w-full py-4 text-slate-400 font-bold uppercase text-xs text-center">Cerrar</button>
+                <input type="number" id="p-price" placeholder="U$D Precio" class="w-full p-4 bg-slate-100 rounded-xl font-bold">
+                <input type="text" id="p-address" placeholder="Dirección" class="w-full p-4 bg-white border-2 border-indigo-100 rounded-xl font-bold">
+                <input type="text" id="p-wa" placeholder="WhatsApp" class="w-full p-4 bg-slate-100 rounded-xl font-bold">
+                <input type="text" id="p-img" placeholder="Link de Foto" class="w-full p-4 bg-slate-100 rounded-xl">
+                <button onclick="saveProp()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase shadow-lg">Publicar Ahora</button>
+                <button onclick="cancelAdd()" class="w-full py-2 text-slate-400 font-bold uppercase text-[10px] text-center">Cancelar</button>
             </div>
         </div>
-    </main>
+    </div>
 
     <nav>
-        <div id="t-map" onclick="showView('map')" class="nav-item active"><span class="text-2xl">🗺️</span>Mapa</div>
-        <div id="t-list" onclick="showView('list')" class="nav-item"><span class="text-2xl">🏠</span>Lista</div>
+        <div id="t-map" onclick="showView('map')" class="nav-item active">
+            <span class="text-xl">🗺️</span>MAPA
+        </div>
+        <div id="t-list" onclick="showView('list')" class="nav-item">
+            <span class="text-xl">📋</span>LISTA
+        </div>
     </nav>
 </div>
 
@@ -130,14 +138,7 @@
 
     var latC, lngC, tempM;
 
-    // SIMULADOR DE PUBLICIDAD (El día de mañana esto vendrá de una base de datos)
-    const AD_DATA = {
-        title: "¡Construí tu sueño!",
-        desc: "Corralón Tandil - Ofertas en cemento y ladrillos.",
-        img: "https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?w=500",
-        link: "https://wa.me/2494000000"
-    };
-
+    // Función Vídeo Transición
     function triggerConsult(wa) {
         const overlay = document.getElementById('video-overlay');
         const video = document.getElementById('transition-video');
@@ -150,20 +151,28 @@
         }, 5000);
     }
 
+    // MAPA CLIC
     map.on('click', function(e) {
         if(tempM) map.removeLayer(tempM);
         latC = e.latlng.lat; lngC = e.latlng.lng;
         tempM = L.marker([latC, lngC], {draggable: true}).addTo(map);
-        tempM.getElement().classList.add('pin-nuevo');
+        tempM.getElement().style.filter = "hue-rotate(240deg) brightness(1.2)"; // Color Dorado
         document.getElementById('btn-confirm').style.display = 'block';
     });
 
+    // CAMBIAR VISTA (ARREGLADO)
     function showView(v) {
         document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+        
         document.getElementById('v-' + v).classList.add('active');
         document.getElementById('t-' + v).classList.add('active');
-        if(v === 'map') setTimeout(() => map.invalidateSize(), 300);
+        
+        if(v === 'map') {
+            setTimeout(() => map.invalidateSize(), 300);
+        } else {
+            document.getElementById('btn-confirm').style.display = 'none';
+        }
     }
 
     function openForm() {
@@ -185,7 +194,7 @@
         const title = document.getElementById('p-title').value;
         const price = document.getElementById('p-price').value;
         const wa = document.getElementById('p-wa').value;
-        if(!title || !price || !wa) return alert("Completa los datos");
+        if(!title || !price || !wa) return alert("Faltan datos");
 
         db.push({
             title, price, wa, address: document.getElementById('p-address').value,
@@ -193,7 +202,7 @@
             op: document.getElementById('p-op').value,
             img: document.getElementById('p-img').value,
             lat: latC, lng: lngC
-        }).then(() => { alert("¡Publicado!"); cancelAdd(); });
+        }).then(() => { alert("Publicado!"); cancelAdd(); });
     }
 
     function loadData() {
@@ -203,29 +212,24 @@
             map.eachLayer(l => { if(l instanceof L.Marker && l !== tempM) map.removeLayer(l); });
 
             let html = "";
-            list.reverse().forEach((p, index) => {
-                // INSERTAR PUBLICIDAD CADA 3 PROPIEDADES
-                if(index > 0 && index % 3 === 0) {
-                    html += `
-                    <div class="ad-card" onclick="window.open('${AD_DATA.link}')">
-                        <span class="ad-badge">SPONSOR</span>
-                        <div class="flex gap-4 items-center">
-                            <img src="${AD_DATA.img}" class="w-16 h-16 rounded-xl object-cover">
-                            <div>
-                                <h4 class="font-black text-amber-800 text-sm uppercase">${AD_DATA.title}</h4>
-                                <p class="text-amber-700 text-[10px] leading-tight">${AD_DATA.desc}</p>
-                            </div>
-                        </div>
-                    </div>`;
+            list.reverse().forEach((p, i) => {
+                // Publicidad cada 3
+                if(i > 0 && i % 3 === 0) {
+                    html += `<div class="ad-card"><p class="text-[8px] font-black text-amber-600 mb-1 uppercase">Sponsor</p><h4 class="font-bold text-sm">CORRALÓN TANDIL</h4><p class="text-[10px]">Ofertas en materiales de construcción.</p></div>`;
                 }
 
                 var m = L.marker([p.lat, p.lng]).addTo(map);
+                var filter = "hue-rotate(0deg)"; // Casa
+                if(p.type === 'depto') filter = "hue-rotate(145deg)";
+                if(p.type === 'terreno') filter = "grayscale(1) brightness(0.3)";
+                m.getElement().style.filter = filter;
+
                 html += `
-                <div class="prop-card">
-                    <img src="${p.img}" onerror="this.src='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500'" class="w-full h-48 object-cover rounded-2xl mb-3">
-                    <h4 class="font-black text-lg text-slate-800 uppercase">${p.title}</h4>
-                    <p class="text-2xl font-black text-indigo-600 mb-4">U$D ${p.price}</p>
-                    <button onclick="triggerConsult('${p.wa}')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-xs">Consultar</button>
+                <div class="bg-white rounded-3xl p-3 shadow-md border border-slate-100">
+                    <img src="${p.img}" onerror="this.src='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500'" class="w-full h-40 object-cover rounded-2xl mb-2">
+                    <h4 class="font-black text-sm uppercase">${p.title}</h4>
+                    <p class="text-xl font-black text-indigo-600 mb-3">U$D ${p.price}</p>
+                    <button onclick="triggerConsult('${p.wa}')" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black uppercase text-[10px]">Consultar</button>
                 </div>`;
             });
             document.getElementById('l-container').innerHTML = html;
