@@ -1,64 +1,44 @@
-// --- MODIFICACIÓN EN LA FUNCIÓN loadData() ---
-// Reemplazá tu función loadData() por esta para que intercale publicidad:
-
-function loadData() {
-    db.on('value', snap => {
-        const list = snap.val() ? Object.values(snap.val()) : [];
-        const tF = document.getElementById('f-type').value;
-        const oF = document.getElementById('f-op').value;
-        map.eachLayer(l => { if(l instanceof L.Marker && l !== tempM) map.removeLayer(l); });
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5719496512652584" crossorigin="anonymous"></script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>TandilProp v30 - Monetized</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; background: #fff; font-family: system-ui, -apple-system, sans-serif; }
+        .app-shell { display: flex; flex-direction: column; height: 100vh; }
+        header { height: 115px; background: white; border-bottom: 2px solid #f1f5f9; padding: 12px; z-index: 1000; }
+        .main-content { flex: 1; position: relative; overflow: hidden; }
+        .view { position: absolute; inset: 0; background: white; z-index: 10; display: none; }
+        .view.active { display: block; }
+        #map { width: 100%; height: 100%; z-index: 5; }
         
-        let html = "";
-        let adCounter = 0; // Contador para meter publicidad
+        #btn-confirm {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 999; background: #4f46e5; color: white; padding: 18px 35px;
+            border-radius: 25px; font-weight: 900; border: 3px solid white;
+            box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4); display: none;
+        }
 
-        list.reverse().forEach((p, i) => {
-            if(tF !== 'todos' && p.type !== tF) return;
-            if(oF !== 'todos' && p.op !== oF) return;
+        nav { height: 85px; background: white; border-top: 2px solid #f1f5f9; display: flex; z-index: 9999; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 11px; font-weight: 800; }
+        .nav-item.active { color: #4f46e5; }
 
-            // Marcador en el mapa
-            var m = L.marker([p.lat, p.lng]).addTo(map);
-            setTimeout(() => { if(m.getElement()) m.getElement().classList.add('pin-' + p.type); }, 100);
-            
-            m.bindPopup(`<div style="width:130px"><p class="font-black text-indigo-600 text-[10px] uppercase">${p.title}</p><p class="font-bold text-sm mb-2">U$D ${p.price}</p><button onclick="triggerConsult('${p.wa}')" class="bg-indigo-600 text-white w-full py-2 rounded-lg text-[10px] font-bold">WHATSAPP</button></div>`);
+        .pin-casa { filter: hue-rotate(0deg); }
+        .pin-depto { filter: hue-rotate(145deg); }
+        .pin-terreno { filter: hue-rotate(85deg) saturate(2); }
+        .pin-nuevo { filter: hue-rotate(240deg) brightness(1.2); }
 
-            // HTML de la propiedad
-            html += `
-            <div class="bg-white rounded-[2rem] p-3 shadow-sm border border-slate-100">
-                <img src="${p.img}" onerror="this.src='https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=500'" class="w-full h-44 object-cover rounded-3xl mb-3">
-                <div class="px-2">
-                    <div class="flex justify-between items-center mb-1">
-                        <h4 class="font-black text-sm uppercase text-slate-700 truncate">${p.title}</h4>
-                        <span class="text-[9px] font-black ${p.type === 'terreno' ? 'bg-green-100 text-green-600' : 'bg-indigo-100 text-indigo-600'} px-2 py-1 rounded-full uppercase">${p.type}</span>
-                    </div>
-                    <p class="text-2xl font-black text-indigo-600 mb-4">U$D ${p.price}</p>
-                    <button onclick="triggerConsult('${p.wa}')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[10px] shadow-lg">Consultar ahora</button>
-                </div>
-            </div>`;
-
-            // CADA 3 PROPIEDADES, INSERTAMOS UN ANUNCIO
-            adCounter++;
-            if(adCounter % 3 === 0) {
-                html += `
-                <div class="p-4 bg-slate-200 rounded-3xl text-center my-4 overflow-hidden" style="min-height:100px">
-                    <p class="text-[9px] text-slate-400 mb-2 font-bold uppercase tracking-widest">Publicidad Sugerida</p>
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-format="fluid"
-                         data-ad-layout-key="-fb+5w+4e-db+86"
-                         data-ad-client="ca-pub-5719496512652584"
-                         data-ad-slot="auto"></ins>
-                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-                </div>`;
-            }
-        });
-        document.getElementById('l-container').innerHTML = html || "<p class='text-center py-10'>No hay propiedades.</p>";
-    });<footer class="p-6 text-center text-slate-400 text-[10px] pb-32">
-    <p>© 2026 TandilProp - Inmuebles en Tandil</p>
-    <div class="flex justify-center gap-4 mt-2">
-        <a href="#" class="underline">Privacidad</a>
-        <a href="#" class="underline">Términos</a>
-        <a href="#" class="underline">Contacto</a>
-    </div>
-    </footer>
-
-}
+        #video-overlay { position: fixed; inset: 0; background: black; z-index: 100000; display: none; align-items: center; justify-content: center; }
+        
+        /* Espacio para publicidad */
+        .ad-container { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 1.5rem; margin: 1rem 0; padding
+        
