@@ -264,5 +264,14 @@
     }
     loadData();
 </script>
+        // REGISTRO DEL SERVICE WORKER PARA INSTALACIÓN PRO
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('TandilProp lista para instalar', reg))
+                .catch(err => console.log('Error de registro', err));
+        });
+    }
+    
 </body>
 </html>
