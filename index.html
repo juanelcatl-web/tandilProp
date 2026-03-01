@@ -6,7 +6,9 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TandilProp v31 GOLD</title>
+    <title>TandilProp | Mercado Inmobiliario y Propiedades en Tandil</title>
+    
+    <meta name="description" content="Encuentra casas, departamentos y terrenos en Tandil. La plataforma líder en real estate local con mapa interactivo y contacto directo por WhatsApp.">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,20 +25,15 @@
     
     <style>
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; background: #fff; font-family: system-ui, -apple-system, sans-serif; }
+        body, html { margin: 0; padding: 0; min-height: 100vh; width: 100vw; background: #fff; font-family: system-ui, -apple-system, sans-serif; }
         
         .app-shell { display: flex; flex-direction: column; height: 100vh; width: 100%; }
-        
-        /* Ajuste de Header */
         header { height: 110px; background: white; border-bottom: 2px solid #f1f5f9; padding: 12px; z-index: 1000; flex-shrink: 0; }
-        
-        /* Ajuste del área principal para que el Nav no tape */
         .main-content { flex: 1; position: relative; overflow: hidden; background: #f8fafc; }
         
-        .view { position: absolute; inset: 0; background: white; z-index: 10; display: none; }
+        .view { position: absolute; inset: 0; background: white; z-index: 10; display: none; overflow-y: auto; }
         .view.active { display: block; }
         
-        /* El Mapa ahora deja espacio para el botón */
         #map { width: 100%; height: 100%; z-index: 5; }
         
         #btn-confirm {
@@ -47,32 +44,26 @@
             width: 80%; text-align: center;
         }
 
-        /* Nav corregido para que se vea bien en todos los celulares */
         nav { 
-            height: 90px; 
-            background: white; 
-            border-top: 2px solid #f1f5f9; 
-            display: flex; 
-            z-index: 9999; 
-            padding-bottom: env(safe-area-inset-bottom);
+            height: 90px; background: white; border-top: 2px solid #f1f5f9; 
+            display: flex; z-index: 9999; padding-bottom: env(safe-area-inset-bottom);
             flex-shrink: 0;
         }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 800; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 800; cursor:pointer; }
         .nav-item.active { color: #4f46e5; }
         .nav-item span { font-size: 24px; margin-bottom: 4px; }
 
-        .pin-casa { filter: hue-rotate(0deg); }
-        .pin-depto { filter: hue-rotate(145deg); }
-        .pin-terreno { filter: hue-rotate(85deg) saturate(2); }
-        .pin-nuevo { filter: hue-rotate(240deg) brightness(1.2); }
-
-        #video-overlay { position: fixed; inset: 0; background: black; z-index: 100000; display: none; align-items: center; justify-content: center; }
-        .ad-container { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 1.5rem; margin: 1rem 0; padding: 10px; min-height: 120px; }
+        .ad-container { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 1.5rem; margin: 1rem 0; padding: 10px; min-height: 250px; }
+        
+        /* Estilos para contenido editorial */
+        .editorial-content { padding: 2rem; background: white; border-top: 4px solid #4f46e5; }
+        .editorial-content h2 { font-size: 1.5rem; font-weight: 900; color: #1e293b; margin-bottom: 1rem; }
+        .editorial-content p { color: #475569; line-height: 1.6; margin-bottom: 1rem; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-<div id="video-overlay">
+<div id="video-overlay" style="position: fixed; inset: 0; background: black; z-index: 100000; display: none; align-items: center; justify-content: center;">
     <video id="transition-video" muted playsinline style="width:100%; height:100%; object-fit:cover; opacity:0.6">
         <source src="https://assets.mixkit.co/videos/preview/mixkit-modern-apartment-complex-buildings-at-sunset-15437-large.mp4" type="video/mp4">
     </video>
@@ -86,7 +77,7 @@
     <header>
         <div class="flex justify-between items-center mb-2">
             <h1 class="text-2xl font-black text-indigo-600 italic tracking-tighter">TANDILPROP</h1>
-            <div class="bg-indigo-100 px-3 py-1 rounded-full text-[8px] font-black text-indigo-600">v31 GOLD</div>
+            <div class="bg-indigo-100 px-3 py-1 rounded-full text-[8px] font-black text-indigo-600 uppercase">Real Estate Local</div>
         </div>
         <div class="flex gap-2">
             <select id="f-type" onchange="loadData()" class="flex-1 p-2 bg-slate-50 border rounded-lg text-[10px] font-bold">
@@ -106,24 +97,41 @@
     <div class="main-content">
         <div id="v-map" class="view active">
             <div id="map"></div>
-            <button id="btn-confirm" onclick="openForm()">📍 USAR ESTA UBICACIÓN</button>
+            <button id="btn-confirm" onclick="openForm()">📍 PUBLICAR EN ESTA UBICACIÓN</button>
         </div>
         
-        <div id="v-list" class="view overflow-y-auto p-4 bg-slate-50">
-            <div id="l-container" class="space-y-4"></div>
+        <div id="v-list" class="view bg-slate-50">
+            <div id="l-container" class="space-y-4 p-4"></div>
+            
+            <article class="editorial-content mt-6">
+                <h2>¿Por qué invertir en Propiedades en Tandil?</h2>
+                <p>Tandil se ha consolidado como uno de los polos de desarrollo inmobiliario más importantes de la Provincia de Buenos Aires. Su combinación única de paisajes serranos, seguridad y un ecosistema tecnológico pujante (impulsado por la UNICEN) atrae constantemente a nuevos residentes e inversores.</p>
+                
+                <div class="ad-container">
+                    <ins class="adsbygoogle" style="display:block" data-ad-format="fluid" data-ad-layout-key="-fb+5w+4e-db+86" data-ad-client="ca-pub-5719496512652584" data-ad-slot="8765432109"></ins>
+                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                </div>
+
+                <h2>Zonas de Crecimiento: Del Centro a las Sierras</h2>
+                <p>Desde los departamentos modernos en la zona céntrica hasta los exclusivos barrios cerrados cerca de la Avenida Don Bosco, el mercado inmobiliario en Tandil ofrece opciones para todos los perfiles. En <strong>TandilProp</strong>, conectamos directamente a compradores con vendedores para agilizar la búsqueda de terrenos y casas.</p>
+                
+                <h2>Consejos para el Alquiler y Venta</h2>
+                <p>Al buscar una propiedad en Tandil, es fundamental verificar la zonificación, especialmente en áreas protegidas de las sierras. Nuestra plataforma facilita la visualización cartográfica para que identifiques exactamente dónde se encuentra tu próxima inversión.</p>
+            </article>
+
             <footer class="text-center py-12 text-slate-400 text-[10px] mb-20">
-                <p class="font-bold">© 2026 TANDILPROP</p>
+                <p class="font-bold">© 2026 TANDILPROP - Una iniciativa de UrbanGrowth Network</p>
                 <div class="flex justify-center gap-3 mt-2 font-black">
-                    <a href="privacidad.html" class="underline">PRIVACIDAD</a>
-                    <a href="#" class="underline">TÉRMINOS</a>
+                    <a href="privacidad.html" class="underline uppercase">Privacidad</a>
+                    <a href="#" class="underline uppercase">Términos Legales</a>
                 </div>
             </footer>
         </div>
 
-        <div id="v-form" class="view overflow-y-auto p-6">
-            <h2 class="text-2xl font-black mb-6 italic">DATOS DE PROPIEDAD</h2>
+        <div id="v-form" class="view p-6">
+            <h2 class="text-2xl font-black mb-6 italic text-indigo-600">PUBLICAR PROPIEDAD</h2>
             <div class="space-y-4 pb-32">
-                <input type="text" id="p-title" placeholder="Título (Ej: Casa 3 dorm)" class="w-full p-4 bg-slate-100 rounded-xl font-bold">
+                <input type="text" id="p-title" placeholder="Título (Ej: Casa 3 dorm)" class="w-full p-4 bg-slate-100 rounded-xl font-bold border-none outline-none focus:ring-2 focus:ring-indigo-500">
                 <div class="flex gap-2">
                     <select id="p-type" class="flex-1 p-4 bg-slate-100 rounded-xl font-bold"><option value="casa">Casa</option><option value="depto">Depto</option><option value="terreno">Terreno</option></select>
                     <select id="p-op" class="flex-1 p-4 bg-slate-100 rounded-xl font-bold text-indigo-600"><option value="venta">Venta</option><option value="alquiler">Alquiler</option></select>
@@ -132,7 +140,7 @@
                 <input type="number" id="p-price" placeholder="U$D Precio" class="w-full p-4 bg-slate-100 rounded-xl font-bold">
                 <input type="text" id="p-wa" placeholder="WhatsApp (Ej: 2494000000)" class="w-full p-4 bg-slate-100 rounded-xl font-bold">
                 <input type="text" id="p-img" placeholder="Link de Foto (URL)" class="w-full p-4 bg-slate-100 rounded-xl">
-                <button onclick="saveProp()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase shadow-lg text-lg">PUBLICAR AHORA</button>
+                <button onclick="saveProp()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase shadow-lg text-lg active:scale-95 transition-all">PUBLICAR AHORA</button>
                 <button onclick="cancelAdd()" class="w-full py-4 text-slate-400 font-bold text-center">Cancelar y volver</button>
             </div>
         </div>
@@ -145,6 +153,7 @@
 </div>
 
 <script>
+    // Firebase Config - Asegurate que tu DB sea pública para escritura/lectura durante el test
     const firebaseConfig = {
         apiKey: "AIzaSyBUViSxd76R5Xc3h4obWtbkGEXADPH8qTw",
         authDomain: "tandilprop-56ec1.firebaseapp.com",
@@ -225,13 +234,12 @@
             map.eachLayer(l => { if(l instanceof L.Marker && l !== tempM) map.removeLayer(l); });
             
             let html = "";
-            let adPos = 0;
+            let adCounter = 0;
 
-            list.reverse().forEach((p, i) => {
+            list.reverse().forEach((p) => {
                 if(tF !== 'todos' && p.type !== tF) return;
                 if(oF !== 'todos' && p.op !== oF) return;
 
-                adPos++;
                 var m = L.marker([p.lat, p.lng]).addTo(map);
                 setTimeout(() => { if(m.getElement()) m.getElement().classList.add('pin-' + p.type); }, 100);
                 
@@ -249,29 +257,27 @@
                         <button onclick="triggerConsult('${p.wa}')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[11px] shadow-lg">Contactar Vendedor</button>
                     </div>
                 </div>`;
-
-                if(adPos % 3 === 0) {
+                
+                adCounter++;
+                if(adCounter % 3 === 0) {
                     html += `
-                    <div class="ad-container text-center">
-                        <p class="text-[8px] font-black text-slate-300 mb-2 uppercase tracking-widest">Publicidad</p>
-                        <ins class="adsbygoogle" style="display:block" data-ad-format="fluid" data-ad-layout-key="-fb+5w+4e-db+86" data-ad-client="ca-pub-5719496512652584" data-ad-slot="auto"></ins>
+                    <div class="ad-container">
+                        <p class="text-[8px] font-black text-center text-slate-300 mb-2 uppercase tracking-widest">Publicidad Sugerida</p>
+                        <ins class="adsbygoogle" style="display:block" data-ad-format="fluid" data-ad-layout-key="-fb+5w+4e-db+86" data-ad-client="ca-pub-5719496512652584" data-ad-slot="8765432109"></ins>
                         <script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>
                     </div>`;
                 }
             });
-            document.getElementById('l-container').innerHTML = html || "<div class='text-center py-20 text-slate-400 font-bold'>No hay resultados.</div>";
+            document.getElementById('l-container').innerHTML = html || "<div class='text-center py-20 text-slate-400 font-bold'>No hay propiedades que coincidan con la búsqueda.</div>";
         });
     }
     loadData();
-</script>
-        // REGISTRO DEL SERVICE WORKER PARA INSTALACIÓN PRO
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('TandilProp lista para instalar', reg))
-                .catch(err => console.log('Error de registro', err));
+            navigator.serviceWorker.register('./sw.js').catch(err => console.log('Error sw', err));
         });
     }
-    
+</script>
 </body>
 </html>
