@@ -13,7 +13,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TandilProp | Mercado Inmobiliario y Guía de Inversión 2026</title>
+    <title>TandilProp | Inteligencia Inmobiliaria en las Sierras</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -28,7 +28,20 @@
         .app-shell { display: none; height: 100dvh; width: 100%; position: fixed; top: 0; left: 0; z-index: 5000; background: white; flex-direction: column; }
         .view { position: absolute; inset: 0; display: none; overflow-y: auto; background: white; }
         .view.active { display: block; }
-        #btn-confirm { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1000; background: #4f46e5; color: white; padding: 16px 30px; border-radius: 20px; font-weight: 900; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.5); border: 2px solid white; white-space: nowrap; }
+        
+        /* Estilo de los Marcadores Personalizados */
+        .custom-pin { 
+            background: #4f46e5; border: 2px solid white; border-radius: 50% 50% 50% 0;
+            width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+            transform: rotate(-45deg); box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .custom-pin span { transform: rotate(45deg); font-size: 14px; }
+        .pin-casa { background: #4f46e5; }
+        .pin-depto { background: #0891b2; }
+        .pin-terreno { background: #059669; }
+
+        /* Modal para Artículos */
+        #article-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; padding: 20px; overflow-y: auto; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -36,78 +49,52 @@
 <div id="landing-page">
     <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-[100] border-b border-slate-200 px-6 py-4 flex justify-between items-center">
         <h1 class="text-2xl font-black text-indigo-600 italic">TANDILPROP</h1>
-        <div class="hidden md:flex gap-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-            <a href="#analisis" class="hover:text-indigo-600">Mercado</a>
-            <a href="#guias" class="hover:text-indigo-600">Guías</a>
-            <a href="#newsletter" class="hover:text-indigo-600">Alertas</a>
-        </div>
         <button onclick="startApp()" class="bg-indigo-600 text-white px-5 py-2 rounded-full font-black text-[10px] uppercase shadow-md">Abrir Mapa</button>
     </nav>
 
     <header class="hero-gradient text-white py-24 px-6 text-center">
         <div class="max-w-4xl mx-auto">
-            <h2 class="text-5xl md:text-7xl font-black mb-6 leading-tight">Invertir en Tandil: <br><span class="text-emerald-400 font-black">Datos, no intuición.</span></h2>
-            <p class="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">La plataforma de geolocalización de oportunidades inmobiliarias y análisis de plusvalía en Tandil.</p>
+            <h2 class="text-5xl md:text-7xl font-black mb-6 leading-tight italic uppercase">Datos Reales.<br><span class="text-emerald-400">Mapa Vivo.</span></h2>
+            <p class="text-xl text-slate-300 mb-10 max-w-2xl mx-auto italic font-light">Análisis de mercado y geolocalización de propiedades en Tandil.</p>
             <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <button onclick="startApp()" class="bg-emerald-500 text-slate-900 px-8 py-4 rounded-xl font-black uppercase text-sm shadow-xl hover:bg-emerald-400">Explorar Propiedades</button>
-                <button onclick="startApp()" class="bg-indigo-600 text-white px-8 py-4 rounded-xl font-black uppercase text-sm shadow-xl">Publicar Gratis</button>
+                <button onclick="startApp()" class="bg-emerald-500 text-slate-900 px-8 py-4 rounded-xl font-black uppercase text-sm shadow-xl">Explorar Propiedades</button>
+                <button onclick="startApp()" class="bg-white/10 text-white border border-white/20 px-8 py-4 rounded-xl font-black uppercase text-sm">Publicar Gratis</button>
             </div>
         </div>
     </header>
 
-    <div class="max-w-6xl mx-auto my-12 px-6">
-        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5719496512652584" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
-
-    <section id="analisis" class="max-w-6xl mx-auto px-6 py-20 bg-white rounded-[3rem] -mt-10 shadow-xl relative z-10">
-        <div class="grid md:grid-cols-2 gap-16">
-            <div>
-                <span class="text-indigo-600 font-black uppercase tracking-widest text-xs">Reporte de Mercado 2026</span>
-                <h3 class="text-4xl font-black mt-4 mb-6 italic uppercase">El auge del m² en las sierras</h3>
-                <p class="text-slate-600 leading-loose mb-6">
-                    Tandil se ha consolidado como el <strong>refugio de valor</strong> por excelencia. Con una rentabilidad neta que supera el 6% anual en alquileres temporales, la zona de <strong>Don Bosco y El Centinela</strong> lidera las búsquedas.
-                </p>
-                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 mb-8">
-                    <h4 class="font-black text-xs uppercase mb-4 text-indigo-600 italic">Indicadores Clave</h4>
-                    <ul class="space-y-3 text-sm font-bold text-slate-500">
-                        <li class="flex justify-between"><span>Precio m² promedio</span> <span class="text-slate-900">U$D 1.250</span></li>
-                        <li class="flex justify-between"><span>Demanda zona Uncas</span> <span class="text-emerald-600">+18% Anual</span></li>
-                    </ul>
-                </div>
+    <section class="max-w-6xl mx-auto px-6 py-20">
+        <h3 class="text-3xl font-black mb-10 italic uppercase border-l-4 border-indigo-600 pl-4 text-slate-900 tracking-tighter">Guías e Inteligencia Inmobiliaria</h3>
+        <div class="grid md:grid-cols-2 gap-8">
+            <div onclick="openArticle(1)" class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-200 transition-all">
+                <span class="text-indigo-600 font-black text-[10px] uppercase tracking-[0.3em] block mb-2">Inversión 2026</span>
+                <h4 class="text-2xl font-black text-slate-800 mb-4 leading-tight">Zonas de Mayor Plusvalía en Tandil: Dónde poner el ojo.</h4>
+                <p class="text-slate-500 text-sm leading-relaxed mb-4">Analizamos el desplazamiento del m² desde el centro hacia las zonas de Don Bosco y La Elena...</p>
+                <span class="text-indigo-600 font-black text-[10px] uppercase underline">Leer análisis completo</span>
             </div>
-            <div id="guias" class="space-y-12">
-                <article>
-                    <h4 class="text-xl font-black text-slate-900 mb-2 uppercase italic">Guía: Dónde comprar hoy</h4>
-                    <p class="text-sm text-slate-500 leading-relaxed italic">Analizamos los barrios con mayor proyección de servicios para los próximos 24 meses. El sur mantiene su perfil premium.</p>
-                </article>
-                <article>
-                    <h4 class="text-xl font-black text-slate-900 mb-2 uppercase italic">Plusvalía en pozo</h4>
-                    <p class="text-sm text-slate-500 leading-relaxed italic">Cómo maximizar el retorno de inversión usando nuestra plataforma para conectar directo con dueños.</p>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <section id="newsletter" class="max-w-4xl mx-auto px-6 py-24 text-center">
-        <div class="bg-indigo-900 rounded-[3rem] p-12 text-white shadow-2xl">
-            <h3 class="text-3xl font-black mb-4 italic uppercase">¿Buscás oportunidades?</h3>
-            <p class="text-indigo-200 mb-8 font-medium">Dejá tu email y te avisamos cuando entre una propiedad a precio de remate.</p>
-            <div class="flex flex-col md:flex-row gap-3">
-                <input type="email" placeholder="Tu email principal" class="flex-1 p-5 rounded-2xl text-slate-900 font-bold outline-none">
-                <button class="bg-emerald-500 text-slate-900 px-10 py-5 rounded-2xl font-black uppercase text-xs hover:bg-emerald-400">Suscribirme</button>
+            <div onclick="openArticle(2)" class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-200 transition-all">
+                <span class="text-emerald-600 font-black text-[10px] uppercase tracking-[0.3em] block mb-2">Turismo & Renta</span>
+                <h4 class="text-2xl font-black text-slate-800 mb-4 leading-tight">Alquiler Temporal: El auge de las cabañas inteligentes.</h4>
+                <p class="text-slate-500 text-sm leading-relaxed mb-4">Por qué Tandil es el destino #1 para el nomadismo digital en la provincia de Buenos Aires...</p>
+                <span class="text-emerald-600 font-black text-[10px] uppercase underline">Ver reporte de rentas</span>
             </div>
         </div>
     </section>
 
     <footer class="bg-slate-900 py-20 text-center text-white px-6">
-        <h2 class="text-2xl font-black mb-4 italic tracking-tighter">TANDILPROP.COM</h2>
         <div class="flex justify-center gap-8 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-10">
             <a href="privacidad.html" class="hover:text-emerald-400">Privacidad</a>
-            <a href="terminos.html" class="hover:text-emerald-400">Términos y Condiciones</a>
+            <a href="terminos.html" class="hover:text-emerald-400">Términos</a>
         </div>
-        <p class="text-[9px] text-slate-700 uppercase font-black">© 2026 UrbanGrowth Network | Tandil</p>
+        <p class="text-[9px] text-slate-700 uppercase font-black tracking-widest">© 2026 UrbanGrowth Network | Tandil</p>
     </footer>
+</div>
+
+<div id="article-modal">
+    <div class="max-w-2xl mx-auto bg-white p-8 md:p-16 rounded-[3rem] relative shadow-2xl mt-10">
+        <button onclick="closeArticle()" class="absolute top-6 right-6 text-slate-400 font-black">X</button>
+        <div id="article-content"></div>
+    </div>
 </div>
 
 <div class="app-shell" id="main-app">
@@ -122,17 +109,17 @@
         </div>
     </header>
     <div class="flex-1 relative overflow-hidden bg-slate-100">
-        <div id="v-map" class="view active"><div id="map" class="h-full w-full"></div><button id="btn-confirm" class="hidden uppercase" onclick="openForm()">📍 PUBLICAR AQUÍ</button></div>
+        <div id="v-map" class="view active"><div id="map" class="h-full w-full"></div><button id="btn-confirm" class="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-sm shadow-2xl border-2 border-white hidden uppercase" onclick="openForm()">📍 PUBLICAR AQUÍ</button></div>
         <div id="v-list" class="view p-4 bg-slate-50"><div id="l-container" class="grid grid-cols-1 gap-4 pb-32"></div></div>
         <div id="v-form" class="view p-6 bg-white">
-            <h2 class="text-2xl font-black mb-6 italic text-indigo-600 uppercase">Anunciar</h2>
+            <h2 class="text-2xl font-black mb-6 italic text-indigo-600 uppercase">Anunciar Propiedad</h2>
             <div class="space-y-4 pb-32">
-                <input type="text" id="p-title" placeholder="Título" class="w-full p-4 bg-slate-100 rounded-xl font-bold">
+                <input type="text" id="p-title" placeholder="Título (Ej: Casa 3 dorm.)" class="w-full p-4 bg-slate-100 rounded-xl font-bold">
                 <div class="flex gap-2"><select id="p-type" class="flex-1 p-4 bg-slate-100 rounded-xl font-bold"><option value="casa">Casa</option><option value="depto">Depto</option><option value="terreno">Terreno</option></select><select id="p-op" class="flex-1 p-4 bg-indigo-50 text-indigo-600 rounded-xl font-bold"><option value="venta">Venta</option><option value="alquiler">Alquiler</option></select></div>
                 <input type="number" id="p-price" placeholder="U$D Precio" class="w-full p-4 bg-slate-100 rounded-xl font-bold">
-                <input type="text" id="p-wa" placeholder="WhatsApp" class="w-full p-4 bg-slate-100 rounded-xl font-bold">
-                <button onclick="saveProp()" id="btn-save" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase">Confirmar</button>
-                <button onclick="cancelAdd()" class="w-full py-4 text-slate-400 font-bold">Cancelar</button>
+                <input type="text" id="p-wa" placeholder="WhatsApp (Ej: 2494123456)" class="w-full p-4 bg-slate-100 rounded-xl font-bold">
+                <button onclick="saveProp()" id="btn-save" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase shadow-lg">Confirmar Publicación</button>
+                <button onclick="cancelAdd()" class="w-full py-4 text-slate-400 font-bold text-center">Cancelar</button>
             </div>
         </div>
     </div>
@@ -143,6 +130,17 @@
 </div>
 
 <script>
+    // CONTROL DE ARTÍCULOS
+    function openArticle(id) {
+        const content = id === 1 ? 
+            `<h2 class='text-3xl font-black italic uppercase mb-6'>Zonas de Mayor Plusvalía en Tandil</h2><p class='leading-relaxed text-slate-600 mb-4'>Tandil se ha fragmentado en zonas con retornos de inversión muy distintos. Mientras que el centro histórico mantiene su valor m² en torno a los U$D 1.300, las zonas de <b>Don Bosco y faldeo serrano</b> están experimentando un crecimiento interanual del 12%. El polo tecnológico atrae a más de 100 empresas de software, lo que genera una demanda constante de vivienda premium.</p>` :
+            `<h2 class='text-3xl font-black italic uppercase mb-6'>Alquiler Temporal en las Sierras</h2><p class='leading-relaxed text-slate-600 mb-4'>La ocupación de cabañas y departamentos de diseño en Tandil rozó el 75% anual en 2025. Con el auge de los nómadas digitales, las propiedades que ofrecen conectividad de alta velocidad y vistas serranas son las más buscadas. La rentabilidad anual neta se sitúa en un 6.2% en dólares.</p>`;
+        document.getElementById('article-content').innerHTML = content;
+        document.getElementById('article-modal').style.display = 'block';
+    }
+    function closeArticle() { document.getElementById('article-modal').style.display = 'none'; }
+
+    // APP LOGIC
     function startApp() { document.getElementById('landing-page').style.display = 'none'; document.getElementById('main-app').style.display = 'flex'; setTimeout(() => { map.invalidateSize(); }, 300); }
     function goBack() { document.getElementById('main-app').style.display = 'none'; document.getElementById('landing-page').style.display = 'block'; }
     function showView(v) { document.querySelectorAll('.view').forEach(e => e.classList.remove('active')); document.getElementById('v-'+v).classList.add('active'); if(v==='map') setTimeout(() => { map.invalidateSize(); }, 200); }
@@ -154,6 +152,17 @@
     var map = L.map('map', {zoomControl: false, attributionControl: false}).setView([-37.3217, -59.1332], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
     var latC, lngC, tempM;
+
+    // ICONOS PERSONALIZADOS POR TIPO
+    function getPinIcon(type) {
+        const emoji = type === 'casa' ? '🏠' : (type === 'depto' ? '🏢' : '🌳');
+        const colorClass = type === 'casa' ? 'pin-casa' : (type === 'depto' ? 'pin-depto' : 'pin-terreno');
+        return L.divIcon({
+            className: 'custom-pin-container',
+            html: `<div class="custom-pin ${colorClass}"><span>${emoji}</span></div>`,
+            iconSize: [30, 30], iconAnchor: [15, 30]
+        });
+    }
 
     map.on('click', function(e) {
         if(tempM) map.removeLayer(tempM);
@@ -169,32 +178,40 @@
         const title = document.getElementById('p-title').value;
         const price = document.getElementById('p-price').value;
         const wa = document.getElementById('p-wa').value;
+        const type = document.getElementById('p-type').value;
         if(!title || !price || !wa) return alert("Faltan datos");
-        db.push({ title, price, wa, type: document.getElementById('p-type').value, op: document.getElementById('p-op').value, img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500", lat: latC, lng: lngC })
-        .then(() => { alert("¡Publicado!"); location.reload(); });
+        db.push({ title, price, wa, type, op: document.getElementById('p-op').value, img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500", lat: latC, lng: lngC })
+        .then(() => { alert("¡Publicado con éxito!"); location.reload(); });
     }
 
     function loadData() {
         db.on('value', snap => {
             const data = snap.val();
             let html = "";
+            const tF = document.getElementById('f-type').value;
+            const oF = document.getElementById('f-op').value;
             map.eachLayer(l => { if(l instanceof L.Marker && l !== tempM) map.removeLayer(l); });
             if (data) {
                 Object.keys(data).reverse().forEach(key => {
                     const p = data[key];
-                    L.marker([p.lat, p.lng]).addTo(map).bindPopup(`<b>${p.title}</b><br>U$D ${p.price}`);
+                    if(tF !== 'todos' && p.type !== tF) return;
+                    if(oF !== 'todos' && p.op !== oF) return;
+                    
+                    L.marker([p.lat, p.lng], {icon: getPinIcon(p.type)}).addTo(map)
+                     .bindPopup(`<div style="padding:10px;text-align:center;"><img src="${p.img}" style="width:100px;border-radius:10px;"><br><b>U$D ${p.price}</b><br><a href="https://wa.me/${p.wa.replace(/\D/g,'')}" target="_blank" style="background:#4f46e5;color:white;padding:5px 10px;display:inline-block;border-radius:5px;text-decoration:none;font-size:10px;margin-top:5px;">WHATSAPP</a></div>`);
+                    
                     html += `<div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
                         <img src="${p.img}" class="w-full h-40 object-cover rounded-2xl mb-3">
                         <h4 class="font-black text-slate-800 uppercase text-xs">${p.title}</h4>
                         <p class="text-xl font-black text-indigo-600">U$D ${p.price}</p>
-                        <a href="https://wa.me/${p.wa.replace(/\D/g,'')}" class="block w-full bg-slate-900 text-white py-3 rounded-xl font-black text-center mt-3 text-[10px] uppercase">Contactar</a>
+                        <a href="https://wa.me/${p.wa.replace(/\D/g,'')}" target="_blank" class="block w-full bg-slate-900 text-white py-3 rounded-xl font-black text-center mt-3 text-[10px] uppercase">Contactar</a>
                     </div>`;
                 });
             }
-            document.getElementById('l-container').innerHTML = html || "<p class='text-center py-20 opacity-30'>Sin anuncios</p>";
+            document.getElementById('l-container').innerHTML = html || "<p class='text-center py-20 opacity-30 italic font-bold uppercase text-xs tracking-widest'>Sin propiedades</p>";
         });
     }
     loadData();
 </script>
 </body>
-    </html>
+</html>
